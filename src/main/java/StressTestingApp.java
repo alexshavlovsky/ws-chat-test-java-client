@@ -1,3 +1,4 @@
+import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.enums.ReadyState;
 
 import java.util.ArrayList;
@@ -5,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+@Slf4j
 public class StressTestingApp {
 
     private static int botsInitialNum = 200;
@@ -19,22 +21,33 @@ public class StressTestingApp {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("Initial bots: " + botsInitialNum);
-        System.out.println("Instantiating bots...");
+        log.info("Initial bots: {}", botsInitialNum);
+        log.info("Instantiating bots...");
         while (bots.size() < botsInitialNum) addBot();
-        System.out.println("Target bots: " + botsMaxNum);
+        Thread.sleep(1000);
+        bots.forEach(TestClient::startRecording);
+        log.info("Target bots: " + botsMaxNum);
+        int typingMesCount = 0;
+        int textMesCount = 0;
         while (bots.size() < botsMaxNum) {
             Thread.sleep(100);
             int i = new Random().nextInt(bots.size());
             TestClient bot = bots.get(i);
             if (bot.getReadyState() == ReadyState.OPEN) {
                 bot.setTyping();
-                if (new Random().nextInt(2) == 0) bot.sendMsg(UUID.randomUUID().toString());
+                typingMesCount++;
+                if (new Random().nextInt(2) == 0) {
+                    bot.sendMsg(UUID.randomUUID().toString());
+                    textMesCount++;
+                }
             }
             addBot();
-            if (bots.size() % 10 == 0) System.out.println("Total bots: " + bots.size() + "/" + botsMaxNum);
+            if (bots.size() % 10 == 0)
+                log.info("Bots (actual/target): {}/{}, messages (text/typing): {}/{}", bots.size(), botsMaxNum, textMesCount, typingMesCount);
         }
-        System.out.println("Disconnecting bots...");
+        int msgCount = bots.stream().map(TestClient::getIncomingMessagesCount).mapToInt(x -> x).sum();
+        log.info("Disconnecting bots...");
         for (TestClient bot : bots) if (bot.getReadyState() == ReadyState.OPEN) bot.closeBlocking();
+        log.info("Total messages processed by server: {}", msgCount);
     }
 }

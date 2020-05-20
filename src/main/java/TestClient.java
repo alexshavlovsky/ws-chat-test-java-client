@@ -9,6 +9,8 @@ import java.util.UUID;
 public class TestClient extends WebSocketClient {
     private static URI serverUri;
     private static int instanceCounter = 0;
+    volatile private boolean recording = false;
+    volatile private int incomingMessagesCount = 0;
 
     static {
         try {
@@ -55,6 +57,7 @@ public class TestClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
+        if (recording) incomingMessagesCount++;
     }
 
     @Override
@@ -71,5 +74,13 @@ public class TestClient extends WebSocketClient {
     @Override
     public void onError(Exception ex) {
         System.out.println("Exception occurred ...\n" + ex + "\n");
+    }
+
+    void startRecording() {
+        this.recording = true;
+    }
+
+    int getIncomingMessagesCount() {
+        return incomingMessagesCount;
     }
 }
