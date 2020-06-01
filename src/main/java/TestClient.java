@@ -36,15 +36,15 @@ public class TestClient extends WebSocketClient {
         ClientMessageModel msg = new ClientMessageModel();
         msg.setFrameId(frameId++);
         msg.setClientId(clientId);
-        msg.setUserNick(nick);
+        msg.setNick(nick);
         msg.setType(type);
         msg.setPayload(payload);
         Gson gson = new Gson();
         send(gson.toJson(msg));
     }
 
-    private void updateClientDetails() {
-        sendTypedMessage("updateMe", "");
+    private void sayHello() {
+        sendTypedMessage("hello", "");
     }
 
     void setTyping() {
@@ -62,7 +62,7 @@ public class TestClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshake) {
-        updateClientDetails();
+        sayHello();
     }
 
     @Override

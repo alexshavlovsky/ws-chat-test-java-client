@@ -4,7 +4,7 @@ import lombok.Data;
 class ClientMessageModel {
     int frameId;
     String clientId;
-    String userNick;
+    String nick;
     String type;
     String payload;
 }
