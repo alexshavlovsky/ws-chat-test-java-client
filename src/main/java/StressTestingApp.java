@@ -15,7 +15,7 @@ public class StressTestingApp {
     private static List<TestClient> bots = new ArrayList<>();
 
     private static void addBot() throws InterruptedException {
-        TestClient client = WsTestClient.newInstance("ws://localhost:8080/ws/", true);
+        TestClient client = WsTestClient.newInstance("ws://localhost:8080/api/ws/", true);
         bots.add(client);
         client.connect();
     }
